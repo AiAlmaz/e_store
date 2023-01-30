@@ -1,0 +1,61 @@
+from django.db import models
+from django.contrib.auth.models import User
+from datetime import date
+
+
+class Goods(models.Model):
+    goods_choices = [
+        ('Orange', 'Orange'),
+        ('Blueberry', 'Blueberry'),
+        ('Banana', 'Banana'),
+        ('Apple', 'Apple'),
+        ('Mango', 'Mango'),
+        ('Strawberry', 'Strawberry')
+    ]
+    name = models.CharField(max_length=50)
+    description = models.TextField()
+    price = models.PositiveIntegerField(max_length=10)
+    category = models.CharField(max_length=30, choices=goods_choices)
+    image = models.ImageField(default='w240h240.jpg', blank=True, null=True)
+    sale = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name}"
+
+
+class Order(models.Model):
+    p_method = [
+        ('cash', 'cash'),
+        ('visa', 'visa'),
+        ('paypal', 'paypal')
+    ]
+    name = models.CharField(max_length=10)
+    quantity = models.PositiveIntegerField()
+    email = models.EmailField(max_length=30)
+    phone = models.IntegerField(max_length=15)
+    city = models.CharField(max_length=20)
+    street = models.CharField(max_length=20)
+    house = models.CharField(max_length=10)
+    good = models.ForeignKey(Goods, on_delete=models.SET_NULL, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pay_method = models.CharField(choices=p_method, max_length=10)
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class Comment(models.Model):
+    good = models.ForeignKey(Goods, on_delete=models.CASCADE)
+    date = models.DateField(default=date.today())
+    text = models.TextField(max_length=200)
+
+    def __str__(self):
+        return f'{self.text}'
+
+
+class Rating(models.Model):
+    good = models.ForeignKey(Goods, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    rate = models.PositiveIntegerField(default=1)
+
+
